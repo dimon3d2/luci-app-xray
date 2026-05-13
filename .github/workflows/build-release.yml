@@ -115,7 +115,16 @@ jobs:
             cp "$f" "${{ github.workspace }}/${base%.*}-${{ matrix.arch }}.${base##*.}"
           done
           find "${{ github.workspace }}" -maxdepth 1 -type f \( -name "*.ipk" -o -name "*.apk" \) -exec ls -lh {} \;
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PACKAGE_NAME }}-${{ matrix.arch }}-${{ matrix.id }}
+          path: |
+            *.ipk
+            *.apk
+          if-no-files-found: warn
       - name: Release and Upload Assets
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: |
