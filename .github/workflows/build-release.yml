@@ -1,15 +1,12 @@
 name: Build and Release
-
 on:
   push:
     tags:
       - "*"
   workflow_dispatch:
-
 env:
   PACKAGE_NAME: luci-app-xray
   CACHE_DIR: ~/cache
-
 jobs:
   release:
     name: Build for ${{ matrix.arch }} (${{ matrix.id }})
@@ -19,14 +16,17 @@ jobs:
       matrix:
         include:
           # - id: 23.05
-          #   arch: aarch64_cortex-a53
-          #   sdk_url_path: https://downloads.openwrt.org/releases/25.12.2/targets/mediatek/filogic
+          #   arch: x86_64
+          #   sdk_url_path: https://downloads.openwrt.org/releases/23.05.5/targets/x86/64
           #   sdk_name: -sdk-23.05.5-x86-64_
+          # - id: 25.12
+          #   arch: x86_64
+          #   sdk_url_path: https://downloads.openwrt.org/releases/25.12.2/targets/x86/64
+          #   sdk_name: -sdk-25.12.2-x86-64_
           - id: 25.12
             arch: aarch64_cortex-a53
             sdk_url_path: https://downloads.openwrt.org/releases/25.12.2/targets/mediatek/filogic
-            sdk_name: -sdk-25.12.2-x86-64_
-
+            sdk_name: -sdk-25.12.2-mediatek-filogic_
     env:
       SDK_URL_PATH: ${{ matrix.sdk_url_path }}
       SDK_NAME: ${{ matrix.sdk_name }}
@@ -35,11 +35,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Prepare Cache Key
         id: cache_key
         run: echo "timestamp=$(date +%s)" >> "$GITHUB_OUTPUT"
-
       - name: Setup Cache
         uses: actions/cache@v4
         with:
@@ -125,7 +123,6 @@ jobs:
             *.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   notify:
     name: Notify Release Publish
     runs-on: ubuntu-latest
